@@ -14,6 +14,25 @@
 >
 > **Status / 当前状态**: Early stage, core features usable. 早期迭代中，核心功能可用。
 
+<p align="center">
+  <a href="https://github.com/errore/OpenMindGraph/releases/latest">
+    <img src="https://img.shields.io/github/v/release/errore/OpenMindGraph?style=for-the-badge&label=Download%20Latest%20/%20下载最新版&color=2ea44f" alt="Download Latest Release" />
+  </a>
+  <br>
+  <a href="https://github.com/errore/OpenMindGraph/releases/latest/download/OpenMindGraph_0.1.0_x64-setup.exe">
+    <img src="https://img.shields.io/badge/Windows-x64_Setup-0078D7?style=flat-square&logo=windows" alt="Windows Installer" />
+  </a>
+  <a href="https://github.com/errore/OpenMindGraph/releases/latest/download/OpenMindGraph_0.1.0_x64.dmg">
+    <img src="https://img.shields.io/badge/macOS-Apple_Silicon_%2F_Intel-333333?style=flat-square&logo=apple" alt="macOS DMG" />
+  </a>
+  <a href="https://github.com/errore/OpenMindGraph/releases/latest/download/OpenMindGraph_0.1.0_x86_64.AppImage">
+    <img src="https://img.shields.io/badge/Linux-x86_64_AppImage-E95420?style=flat-square&logo=linux" alt="Linux AppImage" />
+  </a>
+  <a href="https://github.com/errore/OpenMindGraph/releases/latest/download/openmindgraph_0.1.0_amd64.deb">
+    <img src="https://img.shields.io/badge/Linux-.deb_(Ubuntu%2FDebian)-CC0033?style=flat-square&logo=debian" alt="Linux .deb" />
+  </a>
+</p>
+
 ---
 
 ## Why this tool / 为什么要有这个工具
