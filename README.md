@@ -16,10 +16,13 @@
 
 <p align="center">
   <a href="https://github.com/errore/OpenMindGraph/releases/latest">
-    <img src="https://img.shields.io/github/v/release/errore/OpenMindGraph?style=for-the-badge&label=Download%20Latest%20/%20下载最新版&color=2ea44f" alt="Download Latest Release" />
+    <img src="https://img.shields.io/github/v/release/errore/OpenMindGraph?style=for-the-badge&label=Download%20Latest%20/%20%E4%B8%8B%E8%BD%BD%E6%9C%80%E6%96%B0%E7%89%88&color=2ea44f" alt="Download Latest Release" />
   </a>
   <br>
-  <a href="https://github.com/errore/OpenMindGraph/releases/latest/download/OpenMindGraph_0.1.0_x64-setup.exe">
+  <a href="https://github.com/errore/OpenMindGraph/releases/latest/download/OpenMindGraph_0.1.0_x64.exe">
+    <img src="https://img.shields.io/badge/Windows-x64_Setup-0078D7?style=flat-square&logo=windows" alt="Windows Portable" />
+  </a>
+  <a href="https://github.com/errore/OpenMindGraph/releases/latest/download/OpenMindGraph_0.1.0_x64_setup.exe">
     <img src="https://img.shields.io/badge/Windows-x64_Setup-0078D7?style=flat-square&logo=windows" alt="Windows Installer" />
   </a>
   <a href="https://github.com/errore/OpenMindGraph/releases/latest/download/OpenMindGraph_0.1.0_x64.dmg">
