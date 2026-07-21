@@ -15,7 +15,7 @@ function TemplateChatNodeImpl({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as TemplateChatNodeData;
   const {
     template, output, streaming, status, warning,
-    dynamicTargets, provider, model, temperature, maxTokens, systemPrompt,
+    dynamicTargets, model, temperature, maxTokens, systemPrompt,
     setTemplate, execute,
   } = useTemplateChatNode(id, nodeData);
 
@@ -31,7 +31,7 @@ function TemplateChatNodeImpl({ id, data, selected }: NodeProps) {
   const reactFlow = useReactFlow();
 
   const handleSettingsChange = useCallback(
-    (values: { provider?: string; model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }) => {
+    (values: { model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }) => {
       reactFlow.updateNodeData(id, values);
     },
     [id, reactFlow],
@@ -39,7 +39,6 @@ function TemplateChatNodeImpl({ id, data, selected }: NodeProps) {
 
   const handleSettingsReset = useCallback(() => {
     reactFlow.updateNodeData(id, {
-      provider: undefined,
       model: undefined,
       temperature: undefined,
       maxTokens: undefined,
@@ -97,7 +96,6 @@ function TemplateChatNodeImpl({ id, data, selected }: NodeProps) {
       </BaseNode>
       {showSettings && (
         <LlmSettingsPopover
-          provider={provider}
           model={model}
           temperature={temperature}
           maxTokens={maxTokens}

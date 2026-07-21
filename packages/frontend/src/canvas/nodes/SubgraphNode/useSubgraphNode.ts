@@ -2,31 +2,12 @@ import { useCallback, useMemo } from 'react';
 import { useReactFlow } from '@xyflow/react';
 import { chatStream } from '../../../services/llm';
 import type { LLMMessage } from '../../../services/llm';
+import { gatherUpstreamText } from '../../../nodes/gatherUtils';
 
 export interface SubgraphNodeData {
   subgraphId: string;
   summary: string | null;
   collapsed: boolean;
-}
-
-function gatherUpstreamForSummary(
-  nodeId: string,
-  getEdges: ReturnType<typeof useReactFlow>['getEdges'],
-  getNodes: ReturnType<typeof useReactFlow>['getNodes'],
-): string {
-  const inputEdges = getEdges().filter(
-    (e) => e.target === nodeId && e.targetHandle === 'input',
-  );
-  const parts: string[] = [];
-  for (const edge of inputEdges) {
-    const upstreamNode = getNodes().find((n) => n.id === edge.source);
-    if (!upstreamNode) continue;
-    const upstreamData = upstreamNode.data as Record<string, unknown>;
-    if (typeof upstreamData.output === 'string' && upstreamData.output) {
-      parts.push(upstreamData.output);
-    }
-  }
-  return parts.join('\n');
 }
 
 export function useSubgraphNode(id: string, data: SubgraphNodeData) {
@@ -51,7 +32,7 @@ export function useSubgraphNode(id: string, data: SubgraphNodeData) {
 
     updateData({ collapsed: true });
 
-    const input = gatherUpstreamForSummary(id, reactFlow.getEdges, reactFlow.getNodes);
+    const input = gatherUpstreamText(id, 'input', reactFlow.getEdges, reactFlow.getNodes).join('\n');
     const prompt = input
       ? `Summarize the following context concisely in 1-2 sentences:\n\n${input}`
       : 'No upstream context to summarize.';

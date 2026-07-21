@@ -3,7 +3,10 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --filter @openmindgraph/frontend dev",
-    "dev:backend": "pnpm --filter @openmindgraph/backend dev",
+    "build": "pnpm typecheck && pnpm --filter @openmindgraph/frontend build",
+    "tauri": "pnpm --filter @openmindgraph/frontend tauri",
+    "tauri:dev": "pnpm --filter @openmindgraph/frontend tauri dev",
+    "tauri:build": "pnpm --filter @openmindgraph/frontend tauri build",
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

@@ -15,7 +15,7 @@ function SummaryNodeImpl({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as SummaryNodeData;
   const {
     output, prompt, streaming, status, warning,
-    provider, model, temperature, maxTokens, systemPrompt,
+    model, temperature, maxTokens, systemPrompt,
     setPrompt, execute,
   } = useSummaryNode(id, nodeData);
 
@@ -27,7 +27,7 @@ function SummaryNodeImpl({ id, data, selected }: NodeProps) {
   const reactFlow = useReactFlow();
 
   const handleSettingsChange = useCallback(
-    (values: { provider?: string; model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }) => {
+    (values: { model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }) => {
       reactFlow.updateNodeData(id, values);
     },
     [id, reactFlow],
@@ -35,7 +35,6 @@ function SummaryNodeImpl({ id, data, selected }: NodeProps) {
 
   const handleSettingsReset = useCallback(() => {
     reactFlow.updateNodeData(id, {
-      provider: undefined,
       model: undefined,
       temperature: undefined,
       maxTokens: undefined,
@@ -100,7 +99,6 @@ function SummaryNodeImpl({ id, data, selected }: NodeProps) {
       </BaseNode>
       {showSettings && (
         <LlmSettingsPopover
-          provider={provider}
           model={model}
           temperature={temperature}
           maxTokens={maxTokens}

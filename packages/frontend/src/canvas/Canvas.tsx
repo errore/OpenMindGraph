@@ -16,6 +16,7 @@ import {
   type ReactFlowInstance,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
+import './Canvas.css';
 import { ChatNode } from './nodes/ChatNode';
 import { TextNode } from './nodes/TextNode';
 import { TemplateChatNode } from './nodes/TemplateChat';
@@ -27,6 +28,7 @@ import { validateConnection, shouldReplaceOnConnect } from '../nodes/connectionV
 import { CanvasActionsContext } from './CanvasContext';
 import { useSettingsStore } from '../store/settingsStore';
 import { SettingsModal } from '../settings/SettingsModal';
+import { Topbar } from './Topbar';
 
 const nodeTypes = {
   chat: ChatNode,
@@ -58,8 +60,6 @@ export function Canvas() {
   const pendingConnection = useRef<PendingConnection | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const rfInstance = useRef<ReactFlowInstance | null>(null);
-  const fileMenuRef = useRef<HTMLDivElement>(null);
-  const topBarRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const settingsStore = useSettingsStore();
@@ -80,16 +80,6 @@ export function Canvas() {
   useEffect(() => {
     scheduleSave(nodes, edges, viewport);
   }, [nodes, edges, viewport]);
-
-  useEffect(() => {
-    function onClick(e: MouseEvent) {
-      if (fileMenuRef.current && !fileMenuRef.current.contains(e.target as Element)) {
-        setFileMenuOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', onClick);
-    return () => document.removeEventListener('mousedown', onClick);
-  }, []);
 
   const screenToFlowPos = useCallback((clientX: number, clientY: number) => {
     if (rfInstance.current) {
@@ -360,33 +350,14 @@ export function Canvas() {
         <MiniMap />
 
         <Panel position="top-left" className="omg-topbar">
-          <div ref={topBarRef}>
-            <div className="omg-topbar-inner">
-              <div className="omg-topbar-left">
-                <div className="omg-file-menu" ref={fileMenuRef}>
-                  <button
-                    className="omg-topbar-btn"
-                    onClick={() => setFileMenuOpen((v) => !v)}
-                  >
-                    File
-                  </button>
-                  {fileMenuOpen && (
-                    <div className="omg-dropdown">
-                      <button onClick={handleClearCanvas}>Clear Canvas</button>
-                      <button onClick={handleImportMG}>Import .mg</button>
-                      <button onClick={handleExportMG}>Export .mg</button>
-                    </div>
-                  )}
-                </div>
-                <button
-                  className="omg-topbar-btn"
-                  onClick={() => setSettingsOpen(true)}
-                >
-                  Settings
-                </button>
-              </div>
-            </div>
-          </div>
+          <Topbar
+            fileMenuOpen={fileMenuOpen}
+            setFileMenuOpen={setFileMenuOpen}
+            setSettingsOpen={setSettingsOpen}
+            onClearCanvas={handleClearCanvas}
+            onImportMG={handleImportMG}
+            onExportMG={handleExportMG}
+          />
         </Panel>
 
         <Panel position="top-center">
@@ -423,23 +394,6 @@ export function Canvas() {
 
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
 
-      <style>{`
-        .omg-topbar { margin: 8px 0 0 8px !important; }
-        .omg-topbar-inner { display: flex; align-items: center; gap: 16px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 6px 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); }
-        .omg-topbar-left { display: flex; align-items: center; gap: 4px; }
-        .omg-topbar-btn { padding: 5px 12px; border: none; border-radius: 6px; background: transparent; color: #374151; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-        .omg-topbar-btn:hover { background: #f3f4f6; }
-        .omg-file-menu { position: relative; }
-        .omg-dropdown { position: absolute; top: 100%; left: 0; margin-top: 4px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); z-index: 1000; min-width: 140px; }
-        .omg-dropdown button { display: block; width: 100%; padding: 8px 12px; border: none; border-radius: 6px; background: transparent; color: #374151; font-size: 13px; font-weight: 500; cursor: pointer; text-align: left; white-space: nowrap; }
-        .omg-dropdown button:hover { background: #f3f4f6; }
-        .omg-breadcrumb { display: flex; align-items: center; gap: 4px; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 600; color: #374151; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); }
-        .omg-breadcrumb-item { color: #6b7280; }
-        .omg-breadcrumb-item.active { color: #374151; font-weight: 700; }
-        .canvas-context-menu { position: fixed; z-index: 1000; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-        .canvas-context-menu button { display: block; width: 100%; padding: 8px 16px; border: none; border-radius: 6px; background: transparent; color: #374151; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; white-space: nowrap; }
-        .canvas-context-menu button:hover { background: #f3f4f6; }
-      `}</style>
     </div>
     </CanvasActionsContext.Provider>
   );

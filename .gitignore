@@ -9,5 +9,6 @@ __pycache__/
 .env
 .env.local
 *.tsbuildinfo
-src-tauri/target/
-src-tauri/gen/
+packages/frontend/src-tauri/target/
+packages/frontend/src-tauri/gen/
+.idea/

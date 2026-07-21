@@ -3,11 +3,11 @@ import { useReactFlow } from '@xyflow/react';
 import { chatStream } from '../../../services/llm';
 import type { LLMMessage } from '../../../services/llm';
 import { useSettingsStore } from '../../../store/settingsStore';
+import { gatherUpstreamChat } from '../../../nodes/gatherUtils';
 
 export interface SummaryNodeData {
   output: string | null;
   messages?: LLMMessage[];
-  provider?: string;
   model?: string;
   temperature?: number;
   maxTokens?: number;
@@ -15,30 +15,6 @@ export interface SummaryNodeData {
   status: 'idle' | 'running' | 'complete' | 'stale';
   lastRunAt?: number;
   warning?: string;
-}
-
-function gatherUpstreamChat(
-  nodeId: string,
-  getEdges: ReturnType<typeof useReactFlow>['getEdges'],
-  getNodes: ReturnType<typeof useReactFlow>['getNodes'],
-): LLMMessage[] {
-  const chatEdge = getEdges().find(
-    (e) => e.target === nodeId && e.targetHandle === 'chat-input',
-  );
-  if (!chatEdge) return [];
-
-  const upstreamNode = getNodes().find((n) => n.id === chatEdge.source);
-  if (!upstreamNode) return [];
-
-  const upstreamData = upstreamNode.data as unknown as { messages?: LLMMessage[]; upstreamMessages?: LLMMessage[]; output?: string };
-  const context = [...(upstreamData.upstreamMessages ?? []), ...(upstreamData.messages ?? [])];
-  if (context.length > 0) {
-    return context;
-  }
-  if (upstreamData.output) {
-    return [{ role: 'assistant' as const, content: upstreamData.output }];
-  }
-  return [];
 }
 
 export function useSummaryNode(id: string, data: SummaryNodeData) {
@@ -49,7 +25,6 @@ export function useSummaryNode(id: string, data: SummaryNodeData) {
   const output = useMemo(() => data.output ?? null, [data.output]);
   const status = data.status ?? 'idle';
   const streaming = status === 'running';
-  const provider = data.provider ?? settings.provider;
   const model = data.model ?? settings.model;
   const temperature = data.temperature ?? settings.temperature;
   const maxTokens = data.maxTokens ?? settings.maxTokens;
@@ -101,13 +76,12 @@ export function useSummaryNode(id: string, data: SummaryNodeData) {
     try {
       for await (const chunk of chatStream({
         messages,
-        provider,
         model,
         temperature,
         max_tokens: maxTokens,
         system_prompt: systemPrompt,
       })) {
-        result += chunk;
+        if (chunk.type === 'delta') result += chunk.content;
         updateData({ output: result, status: 'running' });
       }
       updateData({ status: 'complete', output: result, lastRunAt: Date.now() });
@@ -115,7 +89,7 @@ export function useSummaryNode(id: string, data: SummaryNodeData) {
       const errorContent = `Error: ${err instanceof Error ? err.message : 'Unknown error'}`;
       updateData({ status: 'complete', output: errorContent });
     }
-  }, [id, prompt, streaming, provider, model, temperature, maxTokens, systemPrompt, updateData, reactFlow]);
+  }, [id, prompt, streaming, model, temperature, maxTokens, systemPrompt, updateData, reactFlow]);
 
   return {
     output,
@@ -124,7 +98,6 @@ export function useSummaryNode(id: string, data: SummaryNodeData) {
     status,
     warning: data.warning,
     lastRunAt: data.lastRunAt,
-    provider,
     model,
     temperature,
     maxTokens,

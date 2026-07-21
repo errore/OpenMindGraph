@@ -3,12 +3,12 @@ import { useReactFlow } from '@xyflow/react';
 import { chatStream } from '../../../services/llm';
 import type { LLMMessage } from '../../../services/llm';
 import { useSettingsStore } from '../../../store/settingsStore';
+import { gatherUpstreamChat } from '../../../nodes/gatherUtils';
 
 export interface ChatNodeData {
   title: string;
   messages: LLMMessage[];
   upstreamMessages?: LLMMessage[];
-  provider?: string;
   model?: string;
   temperature?: number;
   maxTokens?: number;
@@ -18,33 +18,12 @@ export interface ChatNodeData {
   warning?: string;
 }
 
-function gatherUpstreamChat(nodeId: string, edges: ReturnType<typeof useReactFlow>['getEdges'], nodes: ReturnType<typeof useReactFlow>['getNodes']): LLMMessage[] {
-  const chatEdge = edges().find(
-    (e) => e.target === nodeId && e.targetHandle === 'chat-input',
-  );
-  if (!chatEdge) return [];
-
-  const upstreamNode = nodes().find((n) => n.id === chatEdge.source);
-  if (!upstreamNode) return [];
-
-  const upstreamData = upstreamNode.data as unknown as { messages?: LLMMessage[]; upstreamMessages?: LLMMessage[]; output?: string };
-  const context = [...(upstreamData.upstreamMessages ?? []), ...(upstreamData.messages ?? [])];
-  if (context.length > 0) {
-    return context;
-  }
-  if (upstreamData.output) {
-    return [{ role: 'assistant' as const, content: upstreamData.output }];
-  }
-  return [];
-}
-
 export function useChatNode(id: string, data: ChatNodeData) {
   const [input, setInput] = useState('');
   const reactFlow = useReactFlow();
   const settings = useSettingsStore();
 
   const messages = useMemo(() => data.messages ?? [], [data.messages]);
-  const provider = data.provider ?? settings.provider;
   const model = data.model ?? settings.model;
   const temperature = data.temperature ?? settings.temperature;
   const maxTokens = data.maxTokens ?? settings.maxTokens;
@@ -103,15 +82,19 @@ export function useChatNode(id: string, data: ChatNodeData) {
       try {
         for await (const chunk of chatStream({
           messages: llmMessages,
-          provider,
           model,
           temperature,
           max_tokens: maxTokens,
           system_prompt: systemPrompt,
         })) {
-          assistantMsg.content += chunk;
+          if (chunk.type === 'thought') {
+            assistantMsg.reasoning = (assistantMsg.reasoning ?? '') + chunk.content;
+          } else {
+            assistantMsg.content += chunk.content;
+          }
           updateData({ messages: [...messages, userMsg, { ...assistantMsg }] });
         }
+        assistantMsg.content = assistantMsg.content.trim();
         updateData({ status: 'complete', lastRunAt: Date.now() });
       } catch (err) {
         const errorContent = `Error: ${err instanceof Error ? err.message : 'Unknown error'}`;
@@ -126,7 +109,7 @@ export function useChatNode(id: string, data: ChatNodeData) {
         });
       }
     },
-    [id, input, messages, provider, model, temperature, maxTokens, systemPrompt, updateData, streaming, reactFlow, checkUpstreamReady],
+    [id, input, messages, model, temperature, maxTokens, systemPrompt, updateData, streaming, reactFlow, checkUpstreamReady],
   );
 
   const regenerate = useCallback(async () => {
@@ -152,15 +135,19 @@ export function useChatNode(id: string, data: ChatNodeData) {
     try {
       for await (const chunk of chatStream({
         messages: llmMessages,
-        provider,
         model,
         temperature,
         max_tokens: maxTokens,
         system_prompt: systemPrompt,
       })) {
-        assistantMsg.content += chunk;
+        if (chunk.type === 'thought') {
+          assistantMsg.reasoning = (assistantMsg.reasoning ?? '') + chunk.content;
+        } else {
+          assistantMsg.content += chunk.content;
+        }
         updateData({ messages: [...keepMessages, { ...assistantMsg }] });
       }
+      assistantMsg.content = assistantMsg.content.trim();
       updateData({ status: 'complete', lastRunAt: Date.now() });
     } catch (err) {
       const errorContent = `Error: ${err instanceof Error ? err.message : 'Unknown error'}`;
@@ -170,7 +157,7 @@ export function useChatNode(id: string, data: ChatNodeData) {
         messages: [...keepMessages, { role: 'assistant' as const, content: errorContent }],
       });
     }
-  }, [id, messages, provider, model, temperature, maxTokens, systemPrompt, updateData, streaming, reactFlow]);
+  }, [id, messages, model, temperature, maxTokens, systemPrompt, updateData, streaming, reactFlow]);
 
   return {
     messages,
@@ -179,7 +166,6 @@ export function useChatNode(id: string, data: ChatNodeData) {
     status,
     lastRunAt: data.lastRunAt,
     warning: data.warning,
-    provider,
     model,
     temperature,
     maxTokens,

@@ -13,11 +13,12 @@ interface StoredScene {
 
 interface StoredSettings {
   id: string;
-  provider: string;
   model: string;
   temperature: number;
   maxTokens: number;
   systemPrompt: string;
+  llmEndpoint: string;
+  apiKey: string;
   updatedAt: number;
 }
 
@@ -26,7 +27,7 @@ const db = new Dexie('openmindgraph') as Dexie & {
   settings: EntityTable<StoredSettings, 'id'>;
 };
 
-db.version(2).stores({
+db.version(3).stores({
   scenes: '++id, sceneId, updatedAt',
   settings: 'id',
 });

@@ -3,6 +3,7 @@ import { type NodeProps, useReactFlow } from '@xyflow/react';
 import { IoSettingsSharp } from 'react-icons/io5';
 import { BaseNode } from '../../../nodes/BaseNode';
 import { NODE_REGISTRY } from '../../../nodes/nodeRegistry';
+import { MarkdownContent } from '../../../nodes/MarkdownContent';
 import { useScrollLock } from '../../../nodes/scrollUtils';
 import { useChatNode } from './useChatNode';
 import type { ChatNodeData } from './useChatNode';
@@ -13,7 +14,7 @@ import './ChatNode.css';
 function ChatNodeImpl({ id, data, selected }: NodeProps) {
   const nodeData = data as unknown as ChatNodeData & { _width?: number };
   const width = nodeData._width ?? NODE_REGISTRY.chat.width;
-  const { messages, input, streaming, status, warning, provider, model, temperature, maxTokens, systemPrompt, setInput, send, regenerate } = useChatNode(
+  const { messages, input, streaming, status, warning, model, temperature, maxTokens, systemPrompt, setInput, send, regenerate } = useChatNode(
     id,
     nodeData as unknown as ChatNodeData,
   );
@@ -119,7 +120,7 @@ function ChatNodeImpl({ id, data, selected }: NodeProps) {
   );
 
   const handleSettingsChange = useCallback(
-    (values: { provider?: string; model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }) => {
+    (values: { model?: string; temperature?: number; maxTokens?: number; systemPrompt?: string }) => {
       reactFlow.updateNodeData(id, values);
     },
     [id, reactFlow],
@@ -127,7 +128,6 @@ function ChatNodeImpl({ id, data, selected }: NodeProps) {
 
   const handleSettingsReset = useCallback(() => {
     reactFlow.updateNodeData(id, {
-      provider: undefined,
       model: undefined,
       temperature: undefined,
       maxTokens: undefined,
@@ -163,10 +163,28 @@ function ChatNodeImpl({ id, data, selected }: NodeProps) {
           {messages.map((msg, i) => {
             const isLast = i === messages.length - 1;
             const isAssistant = msg.role === 'assistant';
+            const isEmptyAssistant = isAssistant && !msg.content;
+            const isLoading = isLast && isEmptyAssistant && streaming;
             return (
               <div key={i} className="chat-bubble-wrap">
                 <div className={`chat-bubble ${msg.role}`}>
-                  {msg.content}
+                  {msg.reasoning && (
+                    <details className="chat-reasoning">
+                      <summary className="chat-reasoning-summary">Thinking...</summary>
+                      <div className="chat-reasoning-content">{msg.reasoning}</div>
+                    </details>
+                  )}
+                  {isLoading ? (
+                    <span className="chat-loading">
+                      <span className="chat-loading-dot" />
+                      <span className="chat-loading-dot" />
+                      <span className="chat-loading-dot" />
+                    </span>
+                  ) : isAssistant && msg.content ? (
+                    <MarkdownContent content={msg.content} />
+                  ) : (
+                    msg.content
+                  )}
                 </div>
                 {isAssistant && (
                   <div className="chat-actions nodrag">
@@ -222,7 +240,6 @@ function ChatNodeImpl({ id, data, selected }: NodeProps) {
       </BaseNode>
       {showSettings && (
         <LlmSettingsPopover
-          provider={provider}
           model={model}
           temperature={temperature}
           maxTokens={maxTokens}

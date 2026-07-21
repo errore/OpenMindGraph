@@ -4,13 +4,13 @@ import type { HandleDef } from '@openmindgraph/core';
 import { chatStream } from '../../../services/llm';
 import type { LLMMessage } from '../../../services/llm';
 import { useSettingsStore } from '../../../store/settingsStore';
+import { gatherUpstreamText } from '../../../nodes/gatherUtils';
 
 export interface TemplateChatNodeData {
   template: string;
   output: string | null;
   messages?: LLMMessage[];
   status: 'idle' | 'running' | 'complete' | 'stale';
-  provider?: string;
   model?: string;
   temperature?: number;
   maxTokens?: number;
@@ -37,29 +37,6 @@ export function parseTemplateVariables(template: string): HandleDef[] {
   return result;
 }
 
-function gatherUpstreamForVar(
-  nodeId: string,
-  handleId: string,
-  getEdges: ReturnType<typeof useReactFlow>['getEdges'],
-  getNodes: ReturnType<typeof useReactFlow>['getNodes'],
-): string[] {
-  const edges = getEdges().filter(
-    (e) => e.target === nodeId && e.targetHandle === handleId,
-  );
-  const results: string[] = [];
-  for (const edge of edges) {
-    const upstream = getNodes().find((n) => n.id === edge.source);
-    if (!upstream) continue;
-    const data = upstream.data as Record<string, unknown>;
-    if (typeof data.output === 'string' && data.output) {
-      results.push(data.output);
-    } else if (typeof data.content === 'string' && data.content) {
-      results.push(data.content);
-    }
-  }
-  return results;
-}
-
 const DEFAULT_TEMPLATE = 'Summarize the following:\n\n{{context}}';
 
 export function useTemplateChatNode(id: string, data: TemplateChatNodeData) {
@@ -70,7 +47,6 @@ export function useTemplateChatNode(id: string, data: TemplateChatNodeData) {
   const output = useMemo(() => data.output ?? null, [data.output]);
   const status = data.status ?? 'idle';
   const streaming = status === 'running';
-  const provider = data.provider ?? settings.provider;
   const model = data.model ?? settings.model;
   const temperature = data.temperature ?? settings.temperature;
   const maxTokens = data.maxTokens ?? settings.maxTokens;
@@ -137,7 +113,7 @@ export function useTemplateChatNode(id: string, data: TemplateChatNodeData) {
     let filledTemplate = trimmed;
 
     for (const v of vars) {
-      const upstreamTexts = gatherUpstreamForVar(
+      const upstreamTexts = gatherUpstreamText(
         id, v.id, reactFlow.getEdges, reactFlow.getNodes,
       );
       const replacement = upstreamTexts.length > 0
@@ -149,7 +125,7 @@ export function useTemplateChatNode(id: string, data: TemplateChatNodeData) {
       );
     }
 
-    const promptTexts = gatherUpstreamForVar(id, 'prompt', reactFlow.getEdges, reactFlow.getNodes);
+    const promptTexts = gatherUpstreamText(id, 'prompt', reactFlow.getEdges, reactFlow.getNodes);
     const promptContext = promptTexts.join('\n');
     const effectiveSystemPrompt = promptContext || systemPrompt;
 
@@ -162,13 +138,12 @@ export function useTemplateChatNode(id: string, data: TemplateChatNodeData) {
     try {
       for await (const chunk of chatStream({
         messages,
-        provider,
         model,
         temperature,
         max_tokens: maxTokens,
         system_prompt: effectiveSystemPrompt || undefined,
       })) {
-        result += chunk;
+        if (chunk.type === 'delta') result += chunk.content;
         updateData({ output: result, status: 'running' });
       }
       updateData({ status: 'complete', output: result, messages: [{ role: 'user' as const, content: filledTemplate }, { role: 'assistant' as const, content: result }] });
@@ -176,7 +151,7 @@ export function useTemplateChatNode(id: string, data: TemplateChatNodeData) {
       const errorContent = `Error: ${err instanceof Error ? err.message : 'Unknown error'}`;
       updateData({ status: 'complete', output: errorContent });
     }
-  }, [id, template, streaming, provider, model, temperature, maxTokens, systemPrompt, updateData, reactFlow]);
+  }, [id, template, streaming, model, temperature, maxTokens, systemPrompt, updateData, reactFlow]);
 
   return {
     template,
@@ -185,7 +160,6 @@ export function useTemplateChatNode(id: string, data: TemplateChatNodeData) {
     status,
     warning: data.warning,
     dynamicTargets,
-    provider,
     model,
     temperature,
     maxTokens,

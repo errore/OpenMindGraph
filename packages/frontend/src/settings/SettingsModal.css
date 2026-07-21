@@ -102,11 +102,6 @@
   appearance: auto;
 }
 
-.sm-slider {
-  accent-color: #3b82f6;
-  width: 100%;
-}
-
 .sm-textarea {
   padding: 8px 12px;
   border: 1px solid #e5e7eb;
@@ -190,4 +185,92 @@
 
 .sm-btn-save:hover {
   background: #2563eb;
+}
+
+.sm-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+.sm-input-flex {
+  flex: 1;
+}
+
+.sm-toggle-btn {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.sm-toggle-btn:hover {
+  background: #f3f4f6;
+}
+
+.sm-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9ca3af;
+  margin-bottom: -8px;
+}
+
+.sm-section-label:first-child {
+  margin-top: 0;
+}
+
+.sm-divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 4px 0;
+}
+
+.sm-field-hint {
+  font-size: 11px;
+  margin-top: 4px;
+  color: #9ca3af;
+}
+
+.sm-field-error {
+  color: #ef4444;
+}
+
+.sm-model-list {
+  margin-top: 4px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  max-height: 160px;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sm-model-item {
+  display: block;
+  width: 100%;
+  padding: 7px 12px;
+  border: none;
+  background: transparent;
+  color: #1f2937;
+  font-size: 12px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.sm-model-item:hover {
+  background: #f3f4f6;
+}
+
+.sm-toggle-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

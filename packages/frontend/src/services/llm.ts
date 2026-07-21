@@ -1,62 +1,74 @@
-const API_BASE = 'http://localhost:8001';
+import { invoke } from '@tauri-apps/api/core';
+import { listen, type UnlistenFn } from '@tauri-apps/api/event';
 
 export interface LLMMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
+  reasoning?: string;
 }
 
 export interface ChatRequest {
   messages: LLMMessage[];
-  provider?: string;
   model?: string;
   temperature?: number;
   max_tokens?: number;
   system_prompt?: string;
 }
 
-export async function* chatStream(request: ChatRequest): AsyncGenerator<string> {
-  const response = await fetch(`${API_BASE}/api/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      messages: request.messages,
-      provider: request.provider ?? 'openai',
-      model: request.model ?? 'gpt-4o-mini',
-      temperature: request.temperature,
-      max_tokens: request.max_tokens,
-      system_prompt: request.system_prompt,
-    }),
+interface ChatChunk {
+  text: string;
+  thought?: string;
+}
+
+export type StreamChunk =
+  | { type: 'delta'; content: string }
+  | { type: 'thought'; content: string };
+
+export async function* chatStream(request: ChatRequest): AsyncGenerator<StreamChunk> {
+  const chunks: StreamChunk[] = [];
+  let done = false;
+  let wake: (() => void) | null = null;
+
+  const unlisten: UnlistenFn = await listen<ChatChunk>('chat-chunk', (event) => {
+    const { text, thought } = event.payload;
+    if (text === '[DONE]') {
+      done = true;
+      wake?.();
+      return;
+    }
+    if (thought) {
+      chunks.push({ type: 'thought', content: thought });
+    } else {
+      chunks.push({ type: 'delta', content: text });
+    }
+    wake?.();
   });
 
-  if (!response.ok) {
-    throw new Error(`Chat API error: ${response.status} ${response.statusText}`);
-  }
+  const invokePromise = invoke('chat_stream', {
+    request: {
+      messages: request.messages,
+      model: request.model ?? 'gpt-4o-mini',
+      temperature: request.temperature,
+      maxTokens: request.max_tokens,
+      systemPrompt: request.system_prompt,
+    },
+  }).catch((err) => {
+    chunks.push({ type: 'delta', content: `Error: ${String(err)}` });
+    done = true;
+    wake?.();
+  });
 
-  const reader = response.body?.getReader();
-  if (!reader) throw new Error('No response body');
-
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() ?? '';
-
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        const data = line.slice(6);
-        if (data === '[DONE]') return;
-        try {
-          const parsed = JSON.parse(data);
-          if (parsed.text) yield parsed.text;
-        } catch {
-          // skip unparseable chunks
-        }
-      }
+  let index = 0;
+  while (!done || index < chunks.length) {
+    if (index < chunks.length) {
+      yield chunks[index++];
+    } else if (!done) {
+      await new Promise<void>((r) => {
+        wake = r;
+      });
     }
   }
+
+  await invokePromise;
+  unlisten();
 }

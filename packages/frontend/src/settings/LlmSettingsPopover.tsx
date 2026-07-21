@@ -1,15 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useSettingsStore } from '../store/settingsStore';
+import { Slider } from '../components/Slider';
 import './LlmSettingsPopover.css';
 
 interface Props {
-  provider: string;
   model: string;
   temperature: number;
   maxTokens: number;
   systemPrompt: string;
   onChange: (values: {
-    provider?: string;
     model?: string;
     temperature?: number;
     maxTokens?: number;
@@ -20,7 +19,6 @@ interface Props {
 }
 
 export function LlmSettingsPopover({
-  provider,
   model,
   temperature,
   maxTokens,
@@ -32,19 +30,17 @@ export function LlmSettingsPopover({
   const globalSettings = useSettingsStore();
   const popoverRef = useRef<HTMLDivElement>(null);
 
-  const [localProvider, setLocalProvider] = useState(provider);
   const [localModel, setLocalModel] = useState(model);
   const [localTemp, setLocalTemp] = useState(temperature);
   const [localMaxTokens, setLocalMaxTokens] = useState(maxTokens);
   const [localSystemPrompt, setLocalSystemPrompt] = useState(systemPrompt);
 
   useEffect(() => {
-    setLocalProvider(provider);
     setLocalModel(model);
     setLocalTemp(temperature);
     setLocalMaxTokens(maxTokens);
     setLocalSystemPrompt(systemPrompt);
-  }, [provider, model, temperature, maxTokens, systemPrompt]);
+  }, [model, temperature, maxTokens, systemPrompt]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -58,14 +54,13 @@ export function LlmSettingsPopover({
 
   const handleApply = useCallback(() => {
     onChange({
-      provider: localProvider !== globalSettings.provider ? localProvider : undefined,
       model: localModel !== globalSettings.model ? localModel : undefined,
       temperature: localTemp !== globalSettings.temperature ? localTemp : undefined,
       maxTokens: localMaxTokens !== globalSettings.maxTokens ? localMaxTokens : undefined,
       systemPrompt: localSystemPrompt !== globalSettings.systemPrompt ? localSystemPrompt : undefined,
     });
     onClose();
-  }, [localProvider, localModel, localTemp, localMaxTokens, localSystemPrompt, onChange, onClose, globalSettings]);
+  }, [localModel, localTemp, localMaxTokens, localSystemPrompt, onChange, onClose, globalSettings]);
 
   const handleReset = useCallback(() => {
     onReset();
@@ -81,20 +76,6 @@ export function LlmSettingsPopover({
         </div>
         <div className="lsp-body">
           <label className="lsp-field">
-            <span className="lsp-label">Provider</span>
-            <select
-              className="lsp-input"
-              value={localProvider}
-              onChange={(e) => setLocalProvider(e.target.value)}
-            >
-              <option value="openai">openai</option>
-              <option value="anthropic">anthropic</option>
-              <option value="google">google</option>
-              <option value="groq">groq</option>
-              <option value="together_ai">together_ai</option>
-            </select>
-          </label>
-          <label className="lsp-field">
             <span className="lsp-label">Model</span>
             <input
               className="lsp-input"
@@ -107,14 +88,12 @@ export function LlmSettingsPopover({
             <span className="lsp-label">
               Temp <span className="lsp-hint">{localTemp.toFixed(2)}</span>
             </span>
-            <input
-              className="lsp-slider"
-              type="range"
-              min="0"
-              max="2"
-              step="0.01"
+            <Slider
+              min={0}
+              max={2}
+              step={0.01}
               value={localTemp}
-              onChange={(e) => setLocalTemp(parseFloat(e.target.value))}
+              onChange={setLocalTemp}
             />
           </label>
           <label className="lsp-field">

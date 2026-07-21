@@ -11,7 +11,6 @@ export const NodeTypeSchema = z.enum([
 ]);
 
 export const ModelConfigSchema = z.object({
-  provider: z.string(),
   model: z.string(),
   temperature: z.number().min(0).max(2).optional(),
   maxTokens: z.number().int().positive().optional(),
