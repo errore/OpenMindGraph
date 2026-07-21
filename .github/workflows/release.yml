@@ -62,12 +62,28 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
-      - name: Upload installer artifacts
+      - name: Upload bundle artifacts (macOS/Linux)
+        if: matrix.os != 'windows-latest'
         uses: actions/upload-artifact@v4
         with:
           name: bundle-${{ matrix.os }}
           path: packages/frontend/src-tauri/target/release/bundle/
           if-no-files-found: warn
+          retention-days: 7
+
+      - name: Copy portable executable (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          mkdir -p portable
+          cp packages/frontend/src-tauri/target/release/openmindgraph.exe portable/OpenMindGraph.exe
+
+      - name: Upload portable executable (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-windows-latest
+          path: portable/
+          if-no-files-found: error
           retention-days: 7
 
   release:
