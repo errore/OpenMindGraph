@@ -20,7 +20,7 @@
   </a>
   <br>
   <a href="https://github.com/errore/OpenMindGraph/releases/latest/download/OpenMindGraph_0.1.0_x64.exe">
-    <img src="https://img.shields.io/badge/Windows-x64_Setup-0078D7?style=flat-square&logo=windows" alt="Windows Portable" />
+    <img src="https://img.shields.io/badge/Windows-x64_Portable-8CA5BA?style=flat-square&logo=windows" alt="Windows Portable" />
   </a>
   <a href="https://github.com/errore/OpenMindGraph/releases/latest/download/OpenMindGraph_0.1.0_x64_setup.exe">
     <img src="https://img.shields.io/badge/Windows-x64_Setup-0078D7?style=flat-square&logo=windows" alt="Windows Installer" />
