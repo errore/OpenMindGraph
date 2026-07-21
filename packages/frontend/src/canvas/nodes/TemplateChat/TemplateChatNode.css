@@ -1,0 +1,91 @@
+.tc-template-area {
+  width: 100%;
+  min-height: 160px;
+  max-height: 300px;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+  background: #fafafa;
+  color: #1f2937;
+  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  resize: none;
+  overflow-y: auto;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.tc-template-area:focus {
+  background: #ffffff;
+}
+
+.tc-template-area:disabled {
+  opacity: 0.5;
+  background: #f9fafb;
+}
+
+.tc-template-area::placeholder {
+  color: #9ca3af;
+}
+
+.tc-output {
+  border-top: 1px solid #f3f4f6;
+}
+
+.tc-output-label {
+  padding: 6px 14px 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+
+.tc-output-content {
+  padding: 8px 14px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1f2937;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.tc-btn-run {
+  padding: 4px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #3b82f6;
+  color: #ffffff;
+  transition: opacity 0.2s;
+}
+
+.tc-btn-run:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-settings-gear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #6b7280;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-settings-gear:hover {
+  background: #f3f4f6;
+  color: #374151;
+}

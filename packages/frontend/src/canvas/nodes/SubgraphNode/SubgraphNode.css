@@ -1,0 +1,64 @@
+.subgraph-toggle-btn {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.subgraph-toggle-btn:hover {
+  background: #f3f4f6;
+}
+
+.subgraph-body {
+  transition: max-height 0.3s ease;
+}
+
+.subgraph-body.collapsed {
+  max-height: 120px;
+  overflow: hidden;
+}
+
+.subgraph-body.expanded {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.subgraph-summary {
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1f2937;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.subgraph-hint {
+  padding: 4px 14px 10px;
+  font-size: 11px;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.subgraph-empty {
+  padding: 20px 14px;
+  font-size: 13px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.subgraph-loading {
+  padding: 16px 14px;
+  font-size: 13px;
+  color: #9ca3af;
+  font-style: italic;
+}

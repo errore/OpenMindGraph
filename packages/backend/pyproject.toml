@@ -1,9 +1,11 @@
 [project]
 name = "openmindgraph-backend"
 version = "0.0.0"
-description = "FastAPI + LiteLLM proxy for OpenMindGraph"
+description = "FastAPI proxy for OpenMindGraph"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.34.0",
+    "python-dotenv>=1.0.0",
+    "litellm>=1.93.0",
 ]

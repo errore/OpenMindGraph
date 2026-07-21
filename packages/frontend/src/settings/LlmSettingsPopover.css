@@ -1,0 +1,159 @@
+.lsp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+}
+
+.lsp-popover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.14);
+  width: 340px;
+  max-height: 90vh;
+  overflow-y: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1f2937;
+  z-index: 3001;
+}
+
+.lsp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.lsp-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.lsp-close {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+}
+
+.lsp-close:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.lsp-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lsp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lsp-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lsp-hint {
+  font-weight: 400;
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+.lsp-input {
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 5px;
+  font-size: 12px;
+  color: #1f2937;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.lsp-input:focus {
+  border-color: #3b82f6;
+}
+
+.lsp-slider {
+  accent-color: #3b82f6;
+  width: 100%;
+}
+
+.lsp-textarea {
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 5px;
+  font-size: 12px;
+  color: #1f2937;
+  background: #ffffff;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  min-height: 48px;
+}
+
+.lsp-textarea:focus {
+  border-color: #3b82f6;
+}
+
+.lsp-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 10px 16px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.lsp-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lsp-btn-reset {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.lsp-btn-reset:hover {
+  background: #e5e7eb;
+}
+
+.lsp-btn-apply {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+.lsp-btn-apply:hover {
+  background: #2563eb;
+}

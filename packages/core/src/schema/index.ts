@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const NodeTypeSchema = z.enum([
   'chat',
-  'prompt',
+  'templatechat',
   'subgraph',
   'mcp_memory',
   'router',

@@ -1,4 +1,4 @@
-export type NodeType = 'chat' | 'prompt' | 'subgraph' | 'mcp_memory' | 'router' | 'text' | 'code';
+export type NodeType = 'chat' | 'templatechat' | 'subgraph' | 'mcp_memory' | 'router' | 'text' | 'code';
 
 export interface Scene {
   id: string;
@@ -60,9 +60,8 @@ export interface SubgraphNodeData {
   collapsed: boolean;
 }
 
-export interface PromptNodeData {
+export interface TemplateChatNodeData {
   template: string;
-  inputMapping: Record<string, string>;
   output: string | null;
   modelConfig?: ModelConfig;
 }
@@ -89,7 +88,7 @@ export interface CodeNodeData {
 
 export type NodeData =
   | ChatNodeData
-  | PromptNodeData
+  | TemplateChatNodeData
   | SubgraphNodeData
   | MCPMemoryNodeData
   | RouterNodeData
@@ -133,4 +132,5 @@ export interface HandleDef {
   id: string;
   label: string;
   type: 'text' | 'json' | 'code' | 'image';
+  allowMultiple: boolean;
 }
